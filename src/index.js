@@ -118,7 +118,7 @@ const GravityFormForm = ({
 
   if (wasSuccessfullySubmitted) {
     const confirmation = confirmations?.find((el) => el.isDefault);
-    navigate("/thank-you-ppc/");
+    navigate(confirmation.page.node.uri);
   }
 
   return (

@@ -36,5 +36,10 @@ export const FormConfirmation = graphql`
     queryString
     type
     url
+    page {
+      node {
+        uri
+      }
+    }
   }
 `;
