@@ -118,44 +118,9 @@ const GravityFormForm = ({
       }
     }
   };
-
+  // re-direct after submit
   if (wasSuccessfullySubmitted) {
-    const confirmation = confirmations?.find((el) => {
-      // First check if there is a custom confirmation
-      // that is not the default.
-      if (el.isActive && !el.isDefault) {
-        return true;
-      }
-
-      // If not, revert back to the default one.
-      if (el.isDefault) {
-        return true;
-      }
-    });
-
-    if (confirmation.type == "PAGE") {
-      // TODO: Somehow need to get the page URL. Query currently
-      // returns the page ID for the page redirect.
-      navigate("/thank-you-ppc/");
-    }
-
-    if (confirmation.type == "REDIRECT") {
-      // TODO: Check that the redirect is internal.
-      // If not, use window.location to direct to external URL.
-      navigate("/thank-you-ppc/");
-    }
-
-    if (confirmation.type == "MESSAGE") {
-      return (
-        <div className="gform_confirmation_wrapper">
-          <div
-            className="gform_confirmation_message"
-            /* eslint-disable react/no-danger */
-            dangerouslySetInnerHTML={{ __html: confirmation?.message }}
-          />
-        </div>
-      );
-    }
+    navigate("/thank-you-ppc/");
   }
 
   return (
