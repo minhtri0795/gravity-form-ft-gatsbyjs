@@ -133,13 +133,13 @@ const GravityFormForm = ({
       }
     });
 
-    if (confirmation.type !== "PAGE") {
+    if (confirmation.type == "PAGE") {
       // TODO: Somehow need to get the page URL. Query currently
       // returns the page ID for the page redirect.
       navigate("/thank-you-ppc/");
     }
 
-    if (confirmation.type !== "REDIRECT") {
+    if (confirmation.type == "REDIRECT") {
       // TODO: Check that the redirect is internal.
       // If not, use window.location to direct to external URL.
       navigate("/thank-you-ppc/");
