@@ -1,16 +1,5 @@
 import { graphql } from "gatsby";
 
-export const Button = graphql`
-  fragment Button on WpFormButton {
-    conditionalLogic {
-      ...ConditionalLogic
-    }
-    imageUrl
-    text
-    type
-  }
-`;
-
 export const ConditionalLogic = graphql`
   fragment ConditionalLogic on WpConditionalLogic {
     actionType

@@ -38,7 +38,7 @@ const GravityFormForm = ({
   }
 
   const {
-    button,
+    submitButton,
     confirmations,
     databaseId,
     description,
@@ -118,6 +118,7 @@ const GravityFormForm = ({
 
   if (wasSuccessfullySubmitted) {
     const confirmation = confirmations?.find((el) => el.isDefault);
+    console.log(confirmation.page.node.uri);
     navigate(confirmation.page.node.uri);
   }
 
@@ -173,7 +174,7 @@ const GravityFormForm = ({
                     Loading
                   </span>
                 ) : (
-                  button?.text
+                  submitButton?.text
                 )}
               </button>
             </div>
@@ -207,8 +208,13 @@ export const GravityFormFields = graphql`
     labelPlacement
     subLabelPlacement
     title
-    button {
-      ...Button
+    submitButton {
+      conditionalLogic {
+        ...ConditionalLogic
+      }
+      imageUrl
+      text
+      type
     }
     confirmations {
       ...FormConfirmation
