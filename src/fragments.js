@@ -1,5 +1,16 @@
 import { graphql } from "gatsby";
 
+export const Button = graphql`
+  fragment Button on WpFormButton {
+    conditionalLogic {
+      ...ConditionalLogic
+    }
+    imageUrl
+    text
+    type
+  }
+`;
+
 export const ConditionalLogic = graphql`
   fragment ConditionalLogic on WpConditionalLogic {
     actionType
@@ -18,7 +29,6 @@ export const FormConfirmation = graphql`
       ...ConditionalLogic
     }
     id
-    isActive
     isDefault
     message
     name
@@ -26,21 +36,5 @@ export const FormConfirmation = graphql`
     queryString
     type
     url
-    page {
-      node {
-        uri
-      }
-    }
-  }
-`;
-
-export const SubmitButton = graphql`
-  fragment SubmitButton on WpFormSubmitButton {
-    conditionalLogic {
-      ...ConditionalLogic
-    }
-    imageUrl
-    text
-    type
   }
 `;
