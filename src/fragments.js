@@ -18,6 +18,7 @@ export const FormConfirmation = graphql`
       ...ConditionalLogic
     }
     id
+    isActive
     isDefault
     message
     name
@@ -30,5 +31,16 @@ export const FormConfirmation = graphql`
         uri
       }
     }
+  }
+`;
+
+export const SubmitButton = graphql`
+  fragment SubmitButton on WpFormSubmitButton {
+    conditionalLogic {
+      ...ConditionalLogic
+    }
+    imageUrl
+    text
+    type
   }
 `;
