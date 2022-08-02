@@ -15,9 +15,7 @@ const FieldBuilder = ({
   databaseId,
   formFields,
   formLoading,
-  preOnSubmit,
   presetValues,
-  settings,
 }) => {
   // Loop through fields and create
   return formFields.map((field) => {
@@ -46,14 +44,12 @@ const FieldBuilder = ({
       { "hidden-label": islabelHidden(labelPlacement) },
       { gfield_contains_required: isRequired },
       {
-        [`field_sublabel_${valueToLowerCase(
-          subLabelPlacement
-        )}`]: valueToLowerCase(subLabelPlacement),
+        [`field_sublabel_${valueToLowerCase(subLabelPlacement)}`]:
+          valueToLowerCase(subLabelPlacement),
       },
       {
-        [`field_description_${valueToLowerCase(
-          descriptionPlacement
-        )}`]: descriptionPlacement,
+        [`field_description_${valueToLowerCase(descriptionPlacement)}`]:
+          descriptionPlacement,
       },
       `gfield_visibility_${
         valueToLowerCase ? "hidden" : valueToLowerCase(visibility)
@@ -74,11 +70,9 @@ const FieldBuilder = ({
           <Captcha
             captchaTheme={captchaTheme}
             fieldData={field}
-            gfId={id}
             key={id}
+            gfId={id}
             name={inputName}
-            ref={preOnSubmit}
-            settings={settings?.recaptcha}
             wrapClassName={inputWrapperClass}
           />
         );
