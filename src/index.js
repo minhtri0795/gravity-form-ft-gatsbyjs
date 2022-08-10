@@ -65,9 +65,9 @@ const GravityFormForm = ({
     reset,
     formState: { errors },
   } = methods;
-
   const [generalError, setGeneralError] = useState("");
-
+  //
+  const [files, setFiles] = useState(null);
   const onSubmitCallback = async (values) => {
     // Make sure we are not already waiting for a response
     if (!loading) {
@@ -76,12 +76,11 @@ const GravityFormForm = ({
       // Check that at least one field has been filled in
       if (submissionHasOneFieldEntry(values)) {
         setGeneralError("");
-
+        const result = { ...values, fileupload: files };
         const formRes = formatPayload({
           serverData: formFields?.nodes,
-          clientData: values,
+          clientData: result,
         });
-
         submitForm({
           variables: {
             databaseId,
@@ -118,7 +117,11 @@ const GravityFormForm = ({
 
   if (wasSuccessfullySubmitted) {
     const confirmation = confirmations?.find((el) => el.isDefault);
-    const url = new URL(confirmation.url);
+
+    const url =
+      confirmation?.url === ""
+        ? "https://wirehouse-es.com/thank-you/"
+        : new URL(confirmation?.url);
     navigate(url.pathname);
   }
 
@@ -158,6 +161,7 @@ const GravityFormForm = ({
                   formFields={formFields.nodes}
                   presetValues={presetValues}
                   labelPlacement={labelPlacement}
+                  setFiles={setFiles}
                 />
               </ul>
             </div>
