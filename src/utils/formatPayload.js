@@ -13,40 +13,44 @@
 
 const formatter = ({ id, fieldResponse, type, inputs }) => {
   switch (type) {
+    case "FILEUPLOAD":
+      return {
+        fileUploadValues: fieldResponse,
+      }
     case "ADDRESS":
       return {
-        addressValues: value,
-      };
+        addressValues: "",
+      }
     case "CAPTCHA":
       return {
         value: fieldResponse,
-      };
+      }
     case "CHECKBOX":
       // Loop through all Gravity Form Checkbox choices.
       const selectedChoices = inputs
         .map(({ id, label, name }) => {
-          const inputName = name || label;
+          const inputName = name || label
           // If the Gravity Forms choice matches with selected item from user.
           // Add to response.
-          if (fieldResponse.find((option) => option === inputName)) {
+          if (fieldResponse.find(option => option === inputName)) {
             return {
               inputId: id,
               value: inputName,
-            };
+            }
           }
         })
-        .filter(Boolean);
+        .filter(Boolean)
 
       return {
         checkboxValues: selectedChoices,
-      };
+      }
     case "EMAIL":
       // UPDATE TO INCLUDE CONFIRMATION VALUE IF REQUIRED.
       return {
         emailValues: {
           value: fieldResponse,
         },
-      };
+      }
     case "CONSENT":
     case "DATE":
     case "HIDDEN":
@@ -63,43 +67,47 @@ const formatter = ({ id, fieldResponse, type, inputs }) => {
     case "WEBSITE":
       return {
         value: fieldResponse,
-      };
+      }
     case "MULTISELECT":
       return {
         values: fieldResponse,
-      };
+      }
     case "POSTCATEGORY":
       return {
         values: fieldResponse,
-      };
+      }
     case "POSTCUSTOM":
       return {
         values: fieldResponse,
-      };
+      }
     case "POSTTAGS":
       return {
         values: fieldResponse,
-      };
+      }
     default:
-      return {};
+      return {}
   }
-};
+}
 
 export default ({ serverData, clientData }) => {
   const formattedData = serverData
     .map(({ type, inputs, id }) => {
       // Does this particular field have a response?
-      const fieldResponse = clientData[`input_${id}`];
-
+      let fieldResponse
+      if (id === 1) {
+        fieldResponse = clientData["fileupload"]
+      } else {
+        fieldResponse = clientData[`input_${id}`]
+      }
       // If so, lets re-format and add to array.
       if (fieldResponse) {
         return {
           id,
           ...formatter({ id, fieldResponse, type, inputs }),
-        };
+        }
       }
     })
-    .filter(Boolean);
+    .filter(Boolean)
 
-  return formattedData;
-};
+  return formattedData
+}
