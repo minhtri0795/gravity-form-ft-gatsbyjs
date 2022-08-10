@@ -1,15 +1,16 @@
-import classnames from "classnames";
-import React from "react";
+import classnames from "classnames"
+import React, { useEffect, useState } from "react"
 
-import Captcha from "../../components/Captcha";
-import Html from "../../components/Html";
-import Input from "../../components/Input";
-import Multiselect from "../../components/Multiselect";
-import Select from "../../components/Select";
-import SelectorList from "../../components/SelectorList";
-import Textarea from "../../components/Textarea";
-import { valueToLowerCase } from "../../utils/helpers";
-import { islabelHidden } from "../../utils/inputSettings";
+import Captcha from "../../components/Captcha"
+import Html from "../../components/Html"
+import Input from "../../components/Input"
+import Multiselect from "../../components/Multiselect"
+import Select from "../../components/Select"
+import SelectorList from "../../components/SelectorList"
+import Textarea from "../../components/Textarea"
+import FileUpload from "../../components/FileUpload"
+import { valueToLowerCase } from "../../utils/helpers"
+import { islabelHidden } from "../../utils/inputSettings"
 
 const FieldBuilder = ({
   databaseId,
@@ -18,9 +19,10 @@ const FieldBuilder = ({
   preOnSubmit,
   presetValues,
   settings,
+  setFiles,
 }) => {
   // Loop through fields and create
-  return formFields.map((field) => {
+  return formFields.map(field => {
     // Set the wrapper classes
     const {
       id,
@@ -32,9 +34,9 @@ const FieldBuilder = ({
       type,
       size,
       visibility,
-    } = field;
-
-    const isHiddenField = type === "HIDDEN";
+    } = field
+    //
+    const isHiddenField = type === "HIDDEN"
 
     let inputWrapperClass = classnames(
       "gfield",
@@ -46,26 +48,27 @@ const FieldBuilder = ({
       { "hidden-label": islabelHidden(labelPlacement) },
       { gfield_contains_required: isRequired },
       {
-        [`field_sublabel_${valueToLowerCase(
-          subLabelPlacement
-        )}`]: valueToLowerCase(subLabelPlacement),
+        [`field_sublabel_${valueToLowerCase(subLabelPlacement)}`]:
+          valueToLowerCase(subLabelPlacement),
       },
       {
-        [`field_description_${valueToLowerCase(
-          descriptionPlacement
-        )}`]: descriptionPlacement,
+        [`field_description_${valueToLowerCase(descriptionPlacement)}`]:
+          descriptionPlacement,
       },
       `gfield_visibility_${
         valueToLowerCase ? "hidden" : valueToLowerCase(visibility)
       }`
-    );
-
-    const wrapId = `field_${databaseId}_${id}`;
+    )
+    const [myFile, MyFile] = useState(null)
+    useEffect(() => {
+      setFiles(myFile)
+    }, [myFile])
+    const wrapId = `field_${databaseId}_${id}`
 
     //TODO: Should this match GF version "input_form.id_input.id"
-    const inputName = `input_${field.id}`;
+    const inputName = `input_${field.id}`
 
-    const defaultValue = presetValues?.[inputName] || field?.defaultValue || "";
+    const defaultValue = presetValues?.[inputName] || field?.defaultValue || ""
 
     switch (field.type) {
       // Add note for unsupported captcha field
@@ -81,7 +84,7 @@ const FieldBuilder = ({
             settings={settings?.recaptcha}
             wrapClassName={inputWrapperClass}
           />
-        );
+        )
       case "HTML":
         return (
           <Html
@@ -92,7 +95,7 @@ const FieldBuilder = ({
             wrapClassName={inputWrapperClass}
             wrapId={wrapId}
           />
-        );
+        )
       // Start with the standard fields
       case "TEXT":
       case "NUMBER":
@@ -110,7 +113,7 @@ const FieldBuilder = ({
             wrapClassName={inputWrapperClass}
             wrapId={wrapId}
           />
-        );
+        )
       case "TEXTAREA":
         return (
           <Textarea
@@ -122,7 +125,7 @@ const FieldBuilder = ({
             wrapClassName={inputWrapperClass}
             wrapId={wrapId}
           />
-        );
+        )
       case "SELECT":
         return (
           <Select
@@ -133,7 +136,7 @@ const FieldBuilder = ({
             wrapClassName={inputWrapperClass}
             wrapId={wrapId}
           />
-        );
+        )
       case "MULTISELECT":
         return (
           <Multiselect
@@ -144,7 +147,7 @@ const FieldBuilder = ({
             wrapClassName={inputWrapperClass}
             wrapId={wrapId}
           />
-        );
+        )
       case "RADIO":
       case "CHECKBOX":
         return (
@@ -156,12 +159,23 @@ const FieldBuilder = ({
             wrapClassName={inputWrapperClass}
             wrapId={wrapId}
           />
-        );
-
+        )
+      case "FILEUPLOAD":
+        return (
+          <FileUpload
+            fieldData={field}
+            key={id}
+            gfId={id}
+            name={inputName}
+            wrapClassName={inputWrapperClass}
+            wrapId={wrapId}
+            MyFile={MyFile}
+          />
+        )
       default:
-        return null;
+        return null
     }
-  });
-};
+  })
+}
 
-export default FieldBuilder;
+export default FieldBuilder
