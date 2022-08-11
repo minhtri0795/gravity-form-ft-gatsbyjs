@@ -1,21 +1,23 @@
 # Gatsby GraphQl Gravity Forms Component
 
+This custom plugin base on [gatsby-plugin-gravity-forms] (https://www.npmjs.com/package/gatsby-plugin-gravity-forms)
+Also support Upload file and redirect.
 A plug and play component for parsing GraphQL Gravity Form data. Outputs a component using BEM classes, meaning all you need to do is style it.
 
-To be used alongside [gatsby-source-wordpress](https://www.npmjs.com/package/gatsby-source-wordpress) and [wp-graphql-gravity-forms](https://github.com/harness-software/wp-graphql-gravity-forms) (version 0.10.0 up).
+To be used alongside [gatsby-source-wordpress](https://www.npmjs.com/package/gatsby-source-wordpress) and [wp-graphql-gravity-forms](https://github.com/harness-software/wp-graphql-gravity-forms/releases/tag/v0.10.5) (version 0.10.5 stable).
 
 Uses [React Hook Forms](https://react-hook-form.com/) under the hood for all that good state management.
 
-[Apollo](https://github.com/apollographql/apollo-client) is baked in for handling the data submission.
+[Apollo-upload-client ](https://www.npmjs.com/package/apollo-upload-client) is baked in for handling the data submission and upload file.
 
 ## Installation
 
 ```js
-# Install the component
-yarn add gatsby-plugin-gravity-forms
-
 # Or with NPM
-npm i gatsby-plugin-gravity-forms
+npm i https://github.com/minhtri0795/gravity-form-ft-gatsbyjs
+
+# Apollo upload client
+npm i apollo-upload-client
 ```
 
 ## How To Use
@@ -128,7 +130,7 @@ To develop the component, you first need to link it to a Gatsby project. This is
 - [ ] Section
 - [ ] Page
 - [ ] Date
-- [ ] File upload
+- [x] File upload
 - [ ] Post Fields
 - [ ] Pricing Fields
 - [ ] Phone
@@ -159,7 +161,7 @@ To develop the component, you first need to link it to a Gatsby project. This is
 
 - [x] Text Confirmation
 - [ ] Page Change
-- [ ] Redirect
+- [x] Redirect
 - [ ] Redirect query strings
 - [ ] Conditional Logic
 
