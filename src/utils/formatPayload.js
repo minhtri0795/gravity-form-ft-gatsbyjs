@@ -94,7 +94,7 @@ export default ({ serverData, clientData }) => {
     .map(({ type, inputs, id }) => {
       // Does this particular field have a response?
       let fieldResponse
-      if (id === 1) {
+      if (type === "FILEUPLOAD") {
         fieldResponse = clientData["fileupload"]
       } else {
         fieldResponse = clientData[`input_${id}`]
