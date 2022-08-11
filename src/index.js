@@ -120,7 +120,7 @@ const GravityFormForm = ({
 
     const url =
       confirmation?.url === ""
-        ? "https://wirehouse-es.com/thank-you/"
+        ? "https://wirehouse-es.com/thank-you-ppc/"
         : new URL(confirmation?.url);
     navigate(url.pathname);
   }
