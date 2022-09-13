@@ -36,9 +36,11 @@ const GravityFormForm = ({
   } else {
     form = data;
   }
+  // Deconstruct global settings (if provided).
+  const settings = data?.wp?.gfSettings || {};
 
   const {
-    button,
+    submitbutton,
     confirmations,
     databaseId,
     description,
@@ -162,6 +164,7 @@ const GravityFormForm = ({
                   presetValues={presetValues}
                   labelPlacement={labelPlacement}
                   setFiles={setFiles}
+                  settings={settings}
                 />
               </ul>
             </div>
@@ -178,7 +181,7 @@ const GravityFormForm = ({
                     Loading
                   </span>
                 ) : (
-                  button?.text
+                  submitbutton?.text
                 )}
               </button>
             </div>
@@ -212,8 +215,8 @@ export const GravityFormFields = graphql`
     labelPlacement
     subLabelPlacement
     title
-    button {
-      ...Button
+    submitButton {
+      ...SubmitButton
     }
     confirmations {
       ...FormConfirmation
@@ -241,6 +244,16 @@ export const GravityFormFields = graphql`
         ...SelectField
         ...TextAreaField
         ...TextField
+      }
+    }
+  }
+`;
+export const GravityFormSettings = graphql`
+  fragment GravityFormSettings on Wp {
+    gfSettings {
+      recaptcha {
+        publicKey
+        type
       }
     }
   }

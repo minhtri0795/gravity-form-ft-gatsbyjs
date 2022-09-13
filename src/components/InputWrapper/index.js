@@ -21,7 +21,7 @@ const InputWrapper = ({
   wrapId,
 }) => {
   const joinedLabel = `${label}${
-    isRequired ? '<span class="gfield_required">*</span>' : ""
+    isRequired ? '<span class="gfield_required">required</span>' : ""
   }`;
 
   return (
