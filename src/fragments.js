@@ -1,6 +1,6 @@
 import { graphql } from "gatsby";
 
-export const Button = graphql`
+export const SubmitButton = graphql`
 fragment SubmitButton on WpFormSubmitButton {
     conditionalLogic {
       ...ConditionalLogic
