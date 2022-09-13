@@ -40,7 +40,7 @@ const GravityFormForm = ({
   const settings = data?.wp?.gfSettings || {};
 
   const {
-    submitbutton,
+    submitButton,
     confirmations,
     databaseId,
     description,
@@ -181,7 +181,7 @@ const GravityFormForm = ({
                     Loading
                   </span>
                 ) : (
-                  submitbutton?.text
+                  submitButton?.text
                 )}
               </button>
             </div>
