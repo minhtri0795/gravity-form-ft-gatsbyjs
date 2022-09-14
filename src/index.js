@@ -170,7 +170,7 @@ const GravityFormForm = ({
             </div>
 
             <div className={`gform_footer ${valueToLowerCase(labelPlacement)}`}>
-              <button
+            <button
                 className="gravityform__button gform_button button"
                 disabled={loading}
                 id={`gform_submit_button_${databaseId}`}

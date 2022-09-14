@@ -58,7 +58,7 @@ const Captcha = ({ captchaTheme, fieldData, name, ...wrapProps }) => {
         onLoad={() => setLoaded(true)}
         onVerify={changeCaptchaToken}
         ref={captchaRef}
-        sitekey={process.env.GATSBY_RECAPTCHA_SITE_KEY}
+        sitekey={settings?.publicKey}
         theme={captchaTheme || "light"}
       />
       <input
