@@ -66,7 +66,8 @@ const FieldBuilder = ({
     const wrapId = `field_${databaseId}_${id}`
 
     //TODO: Should this match GF version "input_form.id_input.id"
-    const inputName = `input_${field.id}`
+    //Add databaseID to inputID to make sure id is still unique if have 2 forms in same page
+    const inputName = `input_${field.id}_${databaseId}`
 
     const defaultValue = presetValues?.[inputName] || field?.defaultValue || ""
 
