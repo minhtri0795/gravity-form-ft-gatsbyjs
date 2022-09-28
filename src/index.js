@@ -36,11 +36,9 @@ const GravityFormForm = ({
   } else {
     form = data;
   }
-  // Deconstruct global settings (if provided).
-  const settings = data?.wp?.gfSettings || {};
 
   const {
-    submitButton,
+    button,
     confirmations,
     databaseId,
     description,
@@ -67,9 +65,9 @@ const GravityFormForm = ({
     reset,
     formState: { errors },
   } = methods;
+
   const [generalError, setGeneralError] = useState("");
-  //
-  const [files, setFiles] = useState(null);
+
   const onSubmitCallback = async (values) => {
     // Make sure we are not already waiting for a response
     if (!loading) {
@@ -78,11 +76,12 @@ const GravityFormForm = ({
       // Check that at least one field has been filled in
       if (submissionHasOneFieldEntry(values)) {
         setGeneralError("");
-        const result = { ...values, fileupload: files };
+
         const formRes = formatPayload({
           serverData: formFields?.nodes,
-          clientData: result,
+          clientData: values,
         });
+
         submitForm({
           variables: {
             databaseId,
@@ -119,12 +118,20 @@ const GravityFormForm = ({
 
   if (wasSuccessfullySubmitted) {
     const confirmation = confirmations?.find((el) => el.isDefault);
-
-    const url =
-      confirmation?.url === ""
-        ? "https://wirehouse-es.com/thank-you-ppc/"
-        : new URL(confirmation?.url);
-    navigate(url.pathname);
+    if (confirmation.type === "REDIRECT") {
+      const redirect = new URL(confirmation.url);
+      navigate(redirect.pathname);
+    } else {
+      return (
+        <div className="gform_confirmation_wrapper">
+          <div
+            className="gform_confirmation_message"
+            /* eslint-disable react/no-danger */
+            dangerouslySetInnerHTML={{ __html: confirmation?.message }}
+          />
+        </div>
+      );
+    }
   }
 
   return (
@@ -163,14 +170,12 @@ const GravityFormForm = ({
                   formFields={formFields.nodes}
                   presetValues={presetValues}
                   labelPlacement={labelPlacement}
-                  setFiles={setFiles}
-                  settings={settings}
                 />
               </ul>
             </div>
 
             <div className={`gform_footer ${valueToLowerCase(labelPlacement)}`}>
-            <button
+              <button
                 className="gravityform__button gform_button button"
                 disabled={loading}
                 id={`gform_submit_button_${databaseId}`}
@@ -181,7 +186,7 @@ const GravityFormForm = ({
                     Loading
                   </span>
                 ) : (
-                  submitButton?.text
+                  button?.text
                 )}
               </button>
             </div>
@@ -215,8 +220,8 @@ export const GravityFormFields = graphql`
     labelPlacement
     subLabelPlacement
     title
-    submitButton {
-      ...SubmitButton
+    button {
+      ...Button
     }
     confirmations {
       ...FormConfirmation
@@ -244,16 +249,6 @@ export const GravityFormFields = graphql`
         ...SelectField
         ...TextAreaField
         ...TextField
-      }
-    }
-  }
-`;
-export const GravityFormSettings = graphql`
-  fragment GravityFormSettings on Wp {
-    gfSettings {
-      recaptcha {
-        publicKey
-        type
       }
     }
   }
