@@ -76,10 +76,10 @@ const GravityFormForm = ({
       // Check that at least one field has been filled in
       if (submissionHasOneFieldEntry(values)) {
         setGeneralError("");
-        const result = { ...values, fileupload: files };
+        // const result = { ...values, fileupload: files };
         const formRes = formatPayload({
           serverData: formFields?.nodes,
-          clientData: result,
+          clientData: values,
         });
         submitForm({
           variables: {
