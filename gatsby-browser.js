@@ -14,12 +14,11 @@ export const wrapRootElement = ({ element }, { url }) => {
   }
 
   const client = new ApolloClient({
-    uri: url,
-    cache: new InMemoryCache(),
-    link: createUploadLink({
+    link: new HttpLink({
       uri: url,
       fetch,
     }),
+    cache: new InMemoryCache(),
   });
 
   return <ApolloProvider client={client}>{element}</ApolloProvider>;
