@@ -1,6 +1,6 @@
 import classnames from "classnames";
 import PropTypes from "prop-types";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { graphql, navigate } from "gatsby";
 import { useMutation } from "@apollo/client";
 import { useForm, FormProvider } from "react-hook-form";
@@ -29,13 +29,11 @@ const GravityFormForm = ({
   successCallback,
   errorCallback,
 }) => {
+  const preOnSubmit = useRef();
+
   // Split out data depending on how it is passed in.
-  let form;
-  if (data?.wpGfForm) {
-    form = data.wpGfForm;
-  } else {
-    form = data;
-  }
+  const form = data?.wpGfForm || data;
+
   // Deconstruct global settings (if provided).
   const settings = data?.wp?.gfSettings || {};
 
@@ -65,48 +63,52 @@ const GravityFormForm = ({
     handleSubmit,
     setError,
     reset,
+    getValues,
     formState: { errors },
   } = methods;
+
   const [generalError, setGeneralError] = useState("");
-  //
-  const [files, setFiles] = useState(null);
-  const onSubmitCallback = async (values) => {
+
+  const onSubmitCallback = async () => {
     // Make sure we are not already waiting for a response
     if (!loading) {
       // Clean error
 
+      await preOnSubmit?.current?.recaptcha();
+
+      const values = getValues();
+
       // Check that at least one field has been filled in
       if (submissionHasOneFieldEntry(values)) {
         setGeneralError("");
-        const result = { ...values, fileupload: files };
+
         const formRes = formatPayload({
           serverData: formFields?.nodes,
-          clientData: result,
+          clientData: values,
         });
+
         submitForm({
           variables: {
             databaseId,
             fieldValues: formRes,
           },
         })
-          .then(
-            ({
-              data: {
-                submitGravityFormsForm: { errors },
-              },
-            }) => {
-              // Success if no errors returned.
-              if (!Boolean(errors?.length)) {
-                successCallback({
-                  data: formRes,
-                  reset,
-                });
-              } else {
-                handleGravityFormsValidationErrors(errors, setError);
-                errorCallback({ data: formRes, error: errors, reset });
-              }
+          .then(({ data: { submitGfForm: errors } }) => {
+            // Success if no errors returned.
+            if (!Boolean(errors?.length)) {
+              successCallback({
+                data: formRes,
+                reset,
+              });
+            } else {
+              handleGravityFormsValidationErrors(errors, setError);
+              errorCallback({
+                data: formRes,
+                error: errors,
+                reset,
+              });
             }
-          )
+          })
           .catch((error) => {
             setGeneralError("unknownError");
             errorCallback({ data: formRes, error, reset });
@@ -120,11 +122,20 @@ const GravityFormForm = ({
   if (wasSuccessfullySubmitted) {
     const confirmation = confirmations?.find((el) => el.isDefault);
 
-    const url =
-      confirmation?.url === ""
-        ? "https://wirehouse-es.com/thank-you-ppc/"
-        : new URL(confirmation?.url);
-    navigate(url.pathname);
+    if (confirmation.type === "REDIRECT") {
+      const redirect = new URL(confirmation.url);
+      navigate(redirect.pathname);
+    } else {
+      return (
+        <div className="gform_confirmation_wrapper">
+          <div
+            className="gform_confirmation_message"
+            /* eslint-disable react/no-danger */
+            dangerouslySetInnerHTML={{ __html: confirmation?.message }}
+          />
+        </div>
+      );
+    }
   }
 
   return (
@@ -139,8 +150,8 @@ const GravityFormForm = ({
                 ? `gravityform gravityform--loading gravityform--id-${databaseId}`
                 : `gravityform gravityform--id-${databaseId}`
             }
-            id={`gfrom_${databaseId}`}
-            key={`gfrom_-${databaseId}`}
+            id={`gform_${databaseId}`}
+            key={`gform_-${databaseId}`}
             onSubmit={handleSubmit(onSubmitCallback)}
           >
             {generalError && <FormGeneralError errorCode={generalError} />}
@@ -161,16 +172,16 @@ const GravityFormForm = ({
                   databaseId={databaseId}
                   formLoading={loading}
                   formFields={formFields.nodes}
-                  presetValues={presetValues}
                   labelPlacement={labelPlacement}
-                  setFiles={setFiles}
+                  preOnSubmit={preOnSubmit}
+                  presetValues={presetValues}
                   settings={settings}
                 />
               </ul>
             </div>
 
             <div className={`gform_footer ${valueToLowerCase(labelPlacement)}`}>
-            <button
+              <button
                 className="gravityform__button gform_button button"
                 disabled={loading}
                 id={`gform_submit_button_${databaseId}`}
@@ -248,6 +259,7 @@ export const GravityFormFields = graphql`
     }
   }
 `;
+
 export const GravityFormSettings = graphql`
   fragment GravityFormSettings on Wp {
     gfSettings {

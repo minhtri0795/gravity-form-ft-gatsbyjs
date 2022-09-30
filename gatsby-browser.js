@@ -6,7 +6,7 @@ import {
   InMemoryCache,
   HttpLink,
 } from "@apollo/client";
-import { createUploadLink } from "apollo-upload-client";
+
 export const wrapRootElement = ({ element }, { url }) => {
   // Add error handling if no URL passed.
   if (!url) {
@@ -14,12 +14,11 @@ export const wrapRootElement = ({ element }, { url }) => {
   }
 
   const client = new ApolloClient({
-    uri: url,
-    cache: new InMemoryCache(),
-    link: createUploadLink({
+    link: new HttpLink({
       uri: url,
       fetch,
     }),
+    cache: new InMemoryCache(),
   });
 
   return <ApolloProvider client={client}>{element}</ApolloProvider>;
