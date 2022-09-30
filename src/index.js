@@ -120,32 +120,12 @@ const GravityFormForm = ({
   };
 
   if (wasSuccessfullySubmitted) {
-    const confirmation = confirmations?.find((el) => {
-      // First check if there is a custom confirmation
-      // that is not the default.
-      if (el.isActive && !el.isDefault) {
-        return true;
-      }
+    const confirmation = confirmations?.find((el) => el.isDefault);
 
-      // If not, revert back to the default one.
-      if (el.isDefault) {
-        return true;
-      }
-    });
-
-    if (confirmation.type !== "PAGE") {
-      // TODO: Somehow need to get the page URL. Query currently
-      // returns the page ID for the page redirect.
-      navigate(confirmation?.url);
-    }
-
-    if (confirmation.type !== "REDIRECT") {
-      // TODO: Check that the redirect is internal.
-      // If not, use window.location to direct to external URL.
-      navigate(confirmation?.url);
-    }
-
-    if (confirmation.type == "MESSAGE") {
+    if (confirmation.type === "REDIRECT") {
+      const redirect = new URL(confirmation.url);
+      navigate(redirect.pathname);
+    } else {
       return (
         <div className="gform_confirmation_wrapper">
           <div
