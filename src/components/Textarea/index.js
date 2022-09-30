@@ -3,7 +3,7 @@ import { graphql } from "gatsby";
 import PropTypes from "prop-types";
 import React from "react";
 import { useFormContext } from "react-hook-form";
-import InputWrapper from "../InputWrapper";
+import InputWrapper from "../../components/InputWrapper";
 import strings from "../../utils/strings";
 import { valueToLowerCase } from "../../utils/helpers";
 

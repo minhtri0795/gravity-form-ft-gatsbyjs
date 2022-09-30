@@ -1,6 +1,6 @@
 import classnames from "classnames";
 import PropTypes from "prop-types";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { graphql, navigate } from "gatsby";
 import { useMutation } from "@apollo/client";
 import { useForm, FormProvider } from "react-hook-form";
@@ -29,16 +29,16 @@ const GravityFormForm = ({
   successCallback,
   errorCallback,
 }) => {
+  const preOnSubmit = useRef();
+
   // Split out data depending on how it is passed in.
-  let form;
-  if (data?.wpGfForm) {
-    form = data.wpGfForm;
-  } else {
-    form = data;
-  }
+  const form = data?.wpGfForm || data;
+
+  // Deconstruct global settings (if provided).
+  const settings = data?.wp?.gfSettings || {};
 
   const {
-    button,
+    submitButton,
     confirmations,
     databaseId,
     description,
@@ -63,48 +63,52 @@ const GravityFormForm = ({
     handleSubmit,
     setError,
     reset,
+    getValues,
     formState: { errors },
   } = methods;
+
   const [generalError, setGeneralError] = useState("");
-  //
-  const [files, setFiles] = useState(null);
-  const onSubmitCallback = async (values) => {
+
+  const onSubmitCallback = async () => {
     // Make sure we are not already waiting for a response
     if (!loading) {
       // Clean error
 
+      await preOnSubmit?.current?.recaptcha();
+
+      const values = getValues();
+
       // Check that at least one field has been filled in
       if (submissionHasOneFieldEntry(values)) {
         setGeneralError("");
-        // const result = { ...values, fileupload: files };
+
         const formRes = formatPayload({
           serverData: formFields?.nodes,
           clientData: values,
         });
+
         submitForm({
           variables: {
             databaseId,
             fieldValues: formRes,
           },
         })
-          .then(
-            ({
-              data: {
-                submitGravityFormsForm: { errors },
-              },
-            }) => {
-              // Success if no errors returned.
-              if (!Boolean(errors?.length)) {
-                successCallback({
-                  data: formRes,
-                  reset,
-                });
-              } else {
-                handleGravityFormsValidationErrors(errors, setError);
-                errorCallback({ data: formRes, error: errors, reset });
-              }
+          .then(({ data: { submitGfForm: errors } }) => {
+            // Success if no errors returned.
+            if (!Boolean(errors?.length)) {
+              successCallback({
+                data: formRes,
+                reset,
+              });
+            } else {
+              handleGravityFormsValidationErrors(errors, setError);
+              errorCallback({
+                data: formRes,
+                error: errors,
+                reset,
+              });
             }
-          )
+          })
           .catch((error) => {
             setGeneralError("unknownError");
             errorCallback({ data: formRes, error, reset });
@@ -116,13 +120,42 @@ const GravityFormForm = ({
   };
 
   if (wasSuccessfullySubmitted) {
-    const confirmation = confirmations?.find((el) => el.isDefault);
+    const confirmation = confirmations?.find((el) => {
+      // First check if there is a custom confirmation
+      // that is not the default.
+      if (el.isActive && !el.isDefault) {
+        return true;
+      }
 
-    const url =
-      confirmation?.url === ""
-        ? "https://wirehouse-es.com/thank-you-ppc/"
-        : new URL(confirmation?.url);
-    navigate(url.pathname);
+      // If not, revert back to the default one.
+      if (el.isDefault) {
+        return true;
+      }
+    });
+
+    if (confirmation.type !== "PAGE") {
+      // TODO: Somehow need to get the page URL. Query currently
+      // returns the page ID for the page redirect.
+      navigate(confirmation?.url);
+    }
+
+    if (confirmation.type !== "REDIRECT") {
+      // TODO: Check that the redirect is internal.
+      // If not, use window.location to direct to external URL.
+      navigate(confirmation?.url);
+    }
+
+    if (confirmation.type == "MESSAGE") {
+      return (
+        <div className="gform_confirmation_wrapper">
+          <div
+            className="gform_confirmation_message"
+            /* eslint-disable react/no-danger */
+            dangerouslySetInnerHTML={{ __html: confirmation?.message }}
+          />
+        </div>
+      );
+    }
   }
 
   return (
@@ -137,8 +170,8 @@ const GravityFormForm = ({
                 ? `gravityform gravityform--loading gravityform--id-${databaseId}`
                 : `gravityform gravityform--id-${databaseId}`
             }
-            id={`gfrom_${databaseId}`}
-            key={`gfrom_-${databaseId}`}
+            id={`gform_${databaseId}`}
+            key={`gform_-${databaseId}`}
             onSubmit={handleSubmit(onSubmitCallback)}
           >
             {generalError && <FormGeneralError errorCode={generalError} />}
@@ -159,9 +192,10 @@ const GravityFormForm = ({
                   databaseId={databaseId}
                   formLoading={loading}
                   formFields={formFields.nodes}
-                  presetValues={presetValues}
                   labelPlacement={labelPlacement}
-                  setFiles={setFiles}
+                  preOnSubmit={preOnSubmit}
+                  presetValues={presetValues}
+                  settings={settings}
                 />
               </ul>
             </div>
@@ -178,7 +212,7 @@ const GravityFormForm = ({
                     Loading
                   </span>
                 ) : (
-                  button?.text
+                  submitButton?.text
                 )}
               </button>
             </div>
@@ -212,8 +246,8 @@ export const GravityFormFields = graphql`
     labelPlacement
     subLabelPlacement
     title
-    button {
-      ...Button
+    submitButton {
+      ...SubmitButton
     }
     confirmations {
       ...FormConfirmation
@@ -241,6 +275,17 @@ export const GravityFormFields = graphql`
         ...SelectField
         ...TextAreaField
         ...TextField
+      }
+    }
+  }
+`;
+
+export const GravityFormSettings = graphql`
+  fragment GravityFormSettings on Wp {
+    gfSettings {
+      recaptcha {
+        publicKey
+        type
       }
     }
   }
