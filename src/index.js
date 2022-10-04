@@ -26,7 +26,7 @@ import {
 } from "@apollo/client";
 const client = new ApolloClient({
   link: new HttpLink({
-    uri: "http://newheadless.local/graphql",
+    uri: url || "http://newheadless.local/graphql",
     fetch,
   }),
   cache: new InMemoryCache(),
